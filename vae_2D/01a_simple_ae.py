@@ -22,6 +22,8 @@ def show_reconstructions(model, x_valid, n_images=5):
     plt.show()
 
 if __name__ == "__main__":
+    units_layer1=100
+    units_latenr_layer=30
 
     (x_train, y_train),(x_valid,y_valid) = keras.datasets.mnist.load_data()
 
@@ -48,12 +50,12 @@ if __name__ == "__main__":
 
     encoder=keras.models.Sequential([
         keras.layers.Flatten(input_shape=[28,28]),
-        keras.layers.Dense(100,activation='selu'),
-        keras.layers.Dense(30,activation='selu'),
+        keras.layers.Dense(units_layer1,activation='selu'),
+        keras.layers.Dense(units_latenr_layer,activation='selu'),
     ])
 
     decoder=keras.models.Sequential([
-        keras.layers.Dense(100,activation='selu',input_shape=[30]),
+        keras.layers.Dense(units_layer1,activation='selu',input_shape=[units_latenr_layer]),
         keras.layers.Dense(28*28,activation='sigmoid'),
         keras.layers.Reshape([28,28]),
 
@@ -62,8 +64,12 @@ if __name__ == "__main__":
     ae.summary()
     ae.compile(loss="binary_crossentropy",
                optimizer=keras.optimizers.Adam(learning_rate=0.001))
-    history=ae.fit(x_train,x_train,epochs=5,
-           validation_data=[x_valid,x_valid])
+    callbacks = [tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=3),
+                tf.keras.callbacks.TensorBoard(log_dir="./logs")]
+
+    history=ae.fit(x_train,x_train,epochs=500,
+           validation_data=[x_valid,x_valid],
+                   callbacks=callbacks)
 
 
 
