@@ -226,7 +226,7 @@ if __name__ == "__main__":
     # x_train = tf.math.round(x_train) # transform to zeros or ones
     # x_test = tf.math.round(x_test) # transform to zeros or ones
 
-    # Defone tf callbacks
+    # Define tf callbacks
     my_callbacks = [tf.keras.callbacks.EarlyStopping(monitor='loss', patience=5),
                     tf.keras.callbacks.ReduceLROnPlateau(monitor='loss', factor=0.5,
                                                          patience=3, min_lr=0.001),
