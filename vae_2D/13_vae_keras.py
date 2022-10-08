@@ -21,7 +21,7 @@ import tensorflow_probability as tfp
 """
 ## Create a sampling layer
 """
-latent_dim = 5
+latent_dim = 8
 
 
 class Sampling(layers.Layer):
@@ -95,7 +95,6 @@ class VAE(keras.Model):
         ]
 
     def train_step(self, data):
-        print(f' data shape={tf.shape(data[-1])}')
         with tf.GradientTape() as tape:
             z_mean, z_log_var, z = self.encoder(data)
             reconstruction = self.decoder(z)
@@ -111,7 +110,7 @@ class VAE(keras.Model):
             cov_matrix = tfp.stats.correlation(z)
             cov_matrix = tf.linalg.band_part(cov_matrix, num_lower=0, num_upper=-1)  # get upper part
             # cov_matrix = tf.linalg.set_diag(cov_matrix, tf.zeros([m]))  # zeroing diagonal
-            cov_matrix = tf.linalg.set_diag(cov_matrix, tf.zeros([5]))  # zeroing diagonal
+            cov_matrix = tf.linalg.set_diag(cov_matrix, tf.zeros([self.latent_dim]))  # zeroing diagonal
             cov_matrix = tf.math.abs(cov_matrix)  # get abs values of covariance
 
             n_nonzero = tf.math.count_nonzero(cov_matrix, dtype=tf.dtypes.float32)
@@ -200,13 +199,13 @@ if __name__ == "__main__":
     x_test = tf.math.round(x_test)
 
     my_callbacks = [tf.keras.callbacks.EarlyStopping(monitor='loss', patience=5),
-                    tf.keras.callbacks.ReduceLROnPlateau(monitor='loss', factor=0.2,
+                    tf.keras.callbacks.ReduceLROnPlateau(monitor='loss', factor=0.5,
                                                          patience=3, min_lr=0.001)
                     ]
-    beta_cov = 150
+    beta_cov = 500
     vae = VAE(encoder, decoder, latent_dim=latent_dim, beta_cov=beta_cov)
     vae.compile(optimizer=keras.optimizers.Adam(learning_rate=0.01))
-    vae.fit(x_train, epochs=5, batch_size=128, callbacks=my_callbacks)
+    vae.fit(x_train, epochs=500, batch_size=128, callbacks=my_callbacks)
 
     (x_train, y_train), _ = keras.datasets.mnist.load_data()
     x_train = np.expand_dims(x_train, -1).astype("float32") / 255
