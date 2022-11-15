@@ -18,7 +18,7 @@ if __name__ == "__main__":
     dense_cloud=create_dense_3D_cloud(x_size=i,y_size=j,z_size=k,p_of_zeros=p)
     print(dense_cloud)
     # convert to sparse cloud where each point has x,y,z normalized index
-    sparse_cloud=convert_dense_cloud_2_sparse_cloud(dense_cloud,normalized_indexes=True,expand_to_number_of_points=625)
+    sparse_cloud=convert_dense_cloud_2_sparse_cloud(dense_cloud,normalized_indexes=False,expand_to_number_of_points=625)
     print(sparse_cloud)
 
 
